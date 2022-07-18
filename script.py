@@ -37,7 +37,7 @@ for r3, c3, x1, x2 in zip(r3s, c3s, x1s, x2s):
     xs2 = xs[x2 <= xs]
 
     ys0 = np.sqrt(np.clip(r0**2 - xs0**2, 0, None))
-    ys1 = c3[1] + np.sqrt(r3**2 - (xs1 - c3[0])**2)
+    ys1 = c3[1] - np.sqrt(r3**2 - (xs1 - c3[0])**2)
     ys2 = np.sqrt(np.clip(r1**2 - (xs2 - c1[0])**2, 0, None))
 
     ys_top = np.concatenate([ys0, ys1, ys2])
@@ -60,13 +60,17 @@ for i, shp in enumerate(candidate_shapes):
             [shp, shp],
             shape_type='polygon',
             scale=[500, 500],
-            edge_width=[2, 1],
+            translate=[100, 100],
+            rotate=45,
+            edge_width=[0.2, 0.1],
             edge_color=[SAND, FOREST],
             face_color=[LAGOON, LAGOON],
             name=f'option-{i}',
+            opacity=1,
             )
 
 viewer.grid.enabled = True
+viewer.grid.stride = -1
 
 if __name__ == '__main__':
     napari.run()

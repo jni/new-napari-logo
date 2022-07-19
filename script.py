@@ -12,10 +12,10 @@ FOREST = np.array((60, 90, 25, 255)) / 255
 phi = (1 + np.sqrt(5)) / 2
 
 r0 = phi - 1
-c0 = (0, 0)
-r1 = 1
-c1 = (phi, 0)
-r3s = [phi - 1, 1, phi]
+c0 = np.zeros(2)
+r1 = 1.
+c1 = np.array([phi, 0])
+r3s = np.array([phi - 1, 1, phi])
 c3s = np.array([
         [4*phi - 6, 2 * np.sqrt(10*phi - 3 * phi**2 - 8)],
         [2 - phi, 2 * np.sqrt(phi - 1)],

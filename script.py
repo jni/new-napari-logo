@@ -23,7 +23,7 @@ c3s = np.array([
         ])
 
 x1s = r0 * c3s[:, 0] / c3s[:, 1]
-x2s = phi + (c3s[:, 0] - phi) / c3s[:, 1]
+x2s = c1[0] + r1 / (r1+r3s) * (c3s[:, 0] - c1[0])
 
 domain = np.array([1 - phi, phi + 1])
 xs = np.linspace(*domain, num=500, endpoint=True)

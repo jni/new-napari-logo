@@ -62,9 +62,9 @@ for r3, c3, x1, x2 in zip(r3s, c3s, x1s, x2s):
 
     lines_bottom.append(line_bottom)
 
-candidate_shapes = [
-        np.concatenate((line_top, line_bottom), axis=0) for line_top,
-        line_bottom in itertools.product(lines_top, lines_bottom)
+candidate_shapes = [  # yapf: ignore
+        np.concatenate((line_top, line_bottom), axis=0)
+        for line_top, line_bottom in itertools.product(lines_top, lines_bottom)
         ]
 
 

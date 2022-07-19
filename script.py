@@ -31,14 +31,27 @@ xs = np.linspace(*domain, num=500, endpoint=True)
 lines_top = []
 lines_bottom = []
 
+
+def f0(x):
+    return np.sqrt(np.clip(r0**2 - x**2, 0, None))
+
+
+def f1(x):
+    return np.sqrt(np.clip(r1**2 - (x - c1[0])**2, 0, None))
+
+
+def f3(x, c):
+    return c[1] - np.sqrt(np.clip(r3**2 - (x - c[0])**2, 0, None))
+
+
 for r3, c3, x1, x2 in zip(r3s, c3s, x1s, x2s):
     xs0 = xs[xs < x1]
     xs1 = xs[(x1 <= xs) & (xs < x2)]
     xs2 = xs[x2 <= xs]
 
-    ys0 = np.sqrt(np.clip(r0**2 - xs0**2, 0, None))
-    ys1 = c3[1] - np.sqrt(r3**2 - (xs1 - c3[0])**2)
-    ys2 = np.sqrt(np.clip(r1**2 - (xs2 - c1[0])**2, 0, None))
+    ys0 = f0(xs0)
+    ys1 = f3(xs1, c3)
+    ys2 = f1(xs2)
 
     ys_top = np.concatenate([ys0, ys1, ys2])
     line_top = np.stack([xs, ys_top], axis=1)

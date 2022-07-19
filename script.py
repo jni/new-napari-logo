@@ -15,8 +15,9 @@ r0 = phi - 1
 c0 = np.zeros(2)
 r1 = 1.
 c1 = np.array([phi, 0])
-r3s = np.array([phi - 1, 1, phi])
+r3s = np.array([(phi - 1)**2, phi - 1, 1, phi])
 c3s = np.array([
+        [xx := 7 - 4*phi, np.sqrt(1 - xx**2)],
         [4*phi - 6, 2 * np.sqrt(10*phi - 3 * phi**2 - 8)],
         [2 - phi, 2 * np.sqrt(phi - 1)],
         [2*phi - 3, 2 * np.sqrt(2*phi - 2)],
@@ -73,8 +74,8 @@ def full(r):
 
 
 viewer = napari.Viewer()
-for k, shp in enumerate(candidate_shapes[2:3], start=2):
-    i, j = np.divmod(k, 3)
+for k, shp in enumerate(candidate_shapes):
+    i, j = np.divmod(k, len(c3s))
     c3i = c3s[i]
     r3i = r3s[i]
     x1i = x1s[i]

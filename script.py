@@ -125,6 +125,7 @@ for k, shp in enumerate(candidate_shapes):
             size=0.1,
             face_color='white',
             name=f'centers-{i}-{j}',
+            visible=False,
             **extra_params,
             )
     viewer.add_points(
@@ -141,6 +142,7 @@ for k, shp in enumerate(candidate_shapes):
             size=0.1,
             face_color='red',
             name=f'contacts-{i}-{j}',
+            visible=False,
             **extra_params,
             )
 

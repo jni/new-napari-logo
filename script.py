@@ -90,13 +90,14 @@ for k, shp in enumerate(candidate_shapes):
             rotate=45,
             )
     logo_layer = viewer.add_shapes(
-            [shp, shp],
+            [shp, shp, shp],
             shape_type='polygon',
-            edge_width=[0.2, 0.1],
-            edge_color=[SAND, FOREST],
-            face_color=[LAGOON, LAGOON],
+            edge_width=[0.2, 0, 0.1],
+            edge_color=[SAND, FOREST, FOREST],
+            face_color=[LAGOON, LAGOON, 'transparent'],
             name=f'option-{i}-{j}',
             opacity=1,
+            z_index=[0, 1, 3],
             **extra_params,
             )
     logo_layer.add_ellipses(
@@ -105,20 +106,17 @@ for k, shp in enumerate(candidate_shapes):
             face_color=OCEAN,
             z_index=-1,
             )
-    viewer.add_shapes(
+    logo_layer.add_ellipses(
             [
                     np.stack([c0, full(r0)]),
                     np.stack([c1, full(r1)]),
                     np.stack([c3i, full(r3i)]),
                     np.stack([c3j, full(r3j)]),
                     ],
-            shape_type='ellipse',
-            edge_width=0.03,
-            edge_color=SAND,
+            edge_width=0.025,
+            edge_color=np.array(SAND) * [1, 1, 1, 0.4],
             face_color='transparent',
-            opacity=1,
-            name=f'basis-circles-{i}-{j}',
-            **extra_params,
+            z_index=5,
             )
     viewer.add_points(
             [c0, c1, c3i, c3j],
@@ -147,7 +145,7 @@ for k, shp in enumerate(candidate_shapes):
             )
 
 viewer.grid.enabled = True
-viewer.grid.stride = -4
+viewer.grid.stride = -3
 
 if __name__ == '__main__':
     napari.run()

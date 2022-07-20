@@ -113,10 +113,10 @@ for k, shp in enumerate(candidate_shapes):
                     np.stack([c3j, full(r3j)]),
                     ],
             shape_type='ellipse',
-            edge_width=0.1,
-            edge_color='white',
+            edge_width=0.03,
+            edge_color=SAND,
             face_color='transparent',
-            opacity=0.5,
+            opacity=1,
             name=f'basis-circles-{i}-{j}',
             **extra_params,
             )

@@ -5,7 +5,7 @@ import napari
 LAGOON = np.array((147, 207, 251, 255)) / 255  # "napari blue" from website
 # LAGOON = (100, 170, 190)  # from the image itself
 # LAGOON = (80, 100, 130)  # from a darker bit from the image
-OCEAN = np.array((40, 50, 70, 255)) / 255
+OCEAN = np.array((60, 55, 70, 255)) / 255
 SAND = np.array((210, 205, 200, 255)) / 255
 FOREST = np.array((60, 90, 25, 255)) / 255
 

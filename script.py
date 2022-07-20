@@ -89,7 +89,7 @@ for k, shp in enumerate(candidate_shapes):
             translate=[100, 100],
             rotate=45,
             )
-    viewer.add_shapes(
+    logo_layer = viewer.add_shapes(
             [shp, shp],
             shape_type='polygon',
             edge_width=[0.2, 0.1],
@@ -98,6 +98,12 @@ for k, shp in enumerate(candidate_shapes):
             name=f'option-{i}-{j}',
             opacity=1,
             **extra_params,
+            )
+    logo_layer.add_ellipses(
+            [[1, 0], [2*phi - 1, 2*phi - 1]],
+            edge_width=0,
+            face_color=OCEAN,
+            z_index=-1,
             )
     viewer.add_shapes(
             [

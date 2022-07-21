@@ -33,6 +33,17 @@ lines_top = []
 lines_bottom = []
 
 
+def unit_squircle(n_points=4000):
+    xs1 = np.linspace(-1, 1, n_points//2 + 1)
+    xs2 = xs1[-2:0:-1]
+    ys1 = (1 - np.abs(xs1)**5)**0.2
+    ys2 = -ys1[-2:0:-1]
+    xs = np.concatenate([xs1, xs2])
+    ys = np.concatenate([ys1, ys2])
+    pts = np.stack([xs, ys], axis=1)
+    return pts
+
+
 def f0(x):
     return np.sqrt(np.clip(r0**2 - x**2, 0, None))
 

@@ -10,6 +10,12 @@ SAND = np.array((210, 205, 200, 255)) / 255
 FOREST = np.array((60, 90, 25, 255)) / 255
 
 phi = (1 + np.sqrt(5)) / 2
+source_sidelen = (3 + 1 / np.sqrt(2)) * phi - 2
+target_sidelen = 1024
+scale = target_sidelen / source_sidelen
+translate = 2 * (phi-1) * scale
+squircle_scale = target_sidelen / 2
+squircle_translate = target_sidelen / 2
 
 r0 = phi - 1
 c0 = np.zeros(2)
@@ -96,9 +102,19 @@ for k, shp in enumerate(candidate_shapes):
     x1j = x1s[j]
     x2j = x2s[j]
     extra_params = dict(
-            scale=[500, 500],
-            translate=[100, 100],
+            scale=[scale, scale],
+            translate=[translate, translate],
             rotate=45,
+            )
+    background_layer = viewer.add_shapes(
+            [unit_squircle()],
+            shape_type='polygon',
+            edge_width=0,
+            face_color=OCEAN,
+            name='background-{i}-{j}',
+            opacity=1,
+            scale=np.full(2, squircle_scale),
+            translate=np.full(2, squircle_translate),
             )
     logo_layer = viewer.add_shapes(
             [shp, shp, shp],
@@ -110,12 +126,6 @@ for k, shp in enumerate(candidate_shapes):
             opacity=1,
             z_index=[0, 1, 3],
             **extra_params,
-            )
-    logo_layer.add_ellipses(
-            [[1, 0], [2*phi - 1, 2*phi - 1]],
-            edge_width=0,
-            face_color=OCEAN,
-            z_index=-1,
             )
     logo_layer.add_ellipses(
             [
@@ -156,7 +166,7 @@ for k, shp in enumerate(candidate_shapes):
             )
 
 viewer.grid.enabled = True
-viewer.grid.stride = -3
+viewer.grid.stride = -4
 
 if __name__ == '__main__':
     napari.run()

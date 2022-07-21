@@ -91,7 +91,7 @@ def full(r):
 
 
 viewer = napari.Viewer()
-for k, shp in enumerate(candidate_shapes):
+for k, shp in enumerate(candidate_shapes[3:4], start=3):
     i, j = np.divmod(k, len(c3s))
     c3i = c3s[i]
     r3i = r3s[i]

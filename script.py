@@ -52,8 +52,8 @@ def unit_squircle(n_points=4000):
 
 def bottom_left_squircle_mask(n_squircle_points=4000):
     pts = unit_squircle(n_points=n_squircle_points)
-    top_left_squircle = pts[(pts[:, 1] <= 0) & (pts[:, 0] <= 0)]
-    bottom_left_squircle = pts[(pts[:, 1] <= 0) * (pts[:, 0] > 0)]
+    top_left_squircle = pts[(pts[:, 1] <= 0) & (pts[:, 0] < 0)]
+    bottom_left_squircle = pts[(pts[:, 1] <= 0) * (pts[:, 0] >= 0)]
     top_left = np.array([[-1, -2]])
     bottom_left = np.array([[2, -2]])
     bottom_right = np.array([[2, 0]])
@@ -61,7 +61,7 @@ def bottom_left_squircle_mask(n_squircle_points=4000):
             top_left_squircle, top_left, bottom_left, bottom_right,
             bottom_left_squircle
             ])
-    return mask_outline
+    return mask_outline[1:]  # remove discontinuous point at [-1, 0]
 
 
 def f0(x):
@@ -223,9 +223,8 @@ if __name__ == '__main__':
         mask_layer = viewer.add_shapes(
                 [msk := bottom_left_squircle_mask(), msk[:, (1, 0)]],
                 shape_type='polygon',
-                edge_width=0.1,
-                edge_color='white',
-                face_color='red',
+                edge_width=0,
+                face_color='black',
                 name=f'mask-{i}-{j}',
                 opacity=1,
                 scale=np.full(2, squircle_scale),

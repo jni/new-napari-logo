@@ -1,6 +1,36 @@
+"""
+Designing a new napari logo
+---------------------------
+
+This file contains a proposal for a new napari logo that reflects the original,
+itself a reflection of the island of Tabuaeran on which Napari is located.
+
+The new design is based on (what else) the golden ratio ϕ. The two lobes of the
+island are represented by two touching circles. The smaller circle's radius is
+1/ϕ of the larger circle.
+
+The "neck" of the island is itself shaped by two *outside* circles. The top one
+is another factor 1/ϕ smaller, while the bottom one is ϕ bigger. Thus the logo
+is defined by a sequence of radii ϕ, ϕ², ϕ³, and ϕ⁴. For mathematical
+convenience, in the code the radii used are (1/ϕ)², (1/ϕ), 1, and ϕ. A useful
+identity when developing this and to follow the code is 1/ϕ = ϕ - 1. It's also
+a very *cool* identity!
+
+Each layer is centered and oriented for mathematical convenience, then
+transformed to its final position. The island is centered on the center of the
+smaller circle and angled along the 0th axis, which we call x here — it points
+down. y points right.
+
+The background is a squircle, |x|⁵ + |y|⁵ = 1, centered on (0, 0) then scaled
+and translated.
+"""
+
 import itertools
 import numpy as np
 import napari
+
+# Color constants
+# ---------------
 
 LAGOON = np.array((147, 207, 251, 255)) / 255  # "napari blue" from website
 # LAGOON = (100, 170, 190)  # from the image itself
@@ -9,16 +39,31 @@ OCEAN = np.array((60, 55, 70, 255)) / 255
 SAND = np.array((210, 205, 200, 255)) / 255
 FOREST = np.array((60, 90, 25, 255)) / 255
 
+# Numeric constants
+# -----------------
+
+# everyone's favorite ratio
 phi = (1 + np.sqrt(5)) / 2
+# If you make the logo square, put the island at a 45° angle, and margins
+# around it of ϕ-1, this is the side length of the square.
 source_sidelen = (3 + 1 / np.sqrt(2)) * phi - 2
+# But when making a logo we want it to be 1024x1024 or similar. Set the pixel
+# size of the square here
 target_sidelen = 1024
 scale = target_sidelen / source_sidelen
+# the margins + the radius of the smaller circle.
 translate = 2 * (phi-1) * scale
+
+# A squircle has range (-1, 1) in both x and y, hence an unscaled side length
+# of 1 - (-1) = 2.
 squircle_scale = target_sidelen / 2
 squircle_translate = target_sidelen / 2
 
+# radius and center of the smaller bit of the island
 r0 = phi - 1
 c0 = np.zeros(2)
+
+# radius and center of the larger bit of the island
 r1 = 1.
 c1 = np.array([phi, 0])
 r3s = np.array([(phi - 1)**2, phi - 1, 1, phi])
@@ -29,9 +74,12 @@ c3s = np.array([
         [2*phi - 3, 2 * np.sqrt(2*phi - 2)],
         ])
 
+# Intersection point of the small circle and the outside circles
 x1s = c0[0] + r0 / (r0+r3s) * (c3s[:, 0] - c0[0])
+# intersection point of the outside circles and the large circle
 x2s = c1[0] + r1 / (r1+r3s) * (c3s[:, 0] - c1[0])
 
+# distance from the top of the small circle to the bottom of the large circle
 domain = np.array([1 - phi, phi + 1])
 xs = np.linspace(*domain, num=1001, endpoint=True)
 
@@ -65,10 +113,12 @@ def bottom_left_squircle_mask(n_squircle_points=4000):
 
 
 def f0(x):
+    """Return the half-circle of the smaller lobe of the island."""
     return np.sqrt(np.clip(r0**2 - x**2, 0, None))
 
 
 def f1(x):
+    """Return the half-circle of the larger lobe of the island."""
     return np.sqrt(np.clip(r1**2 - (x - c1[0])**2, 0, None))
 
 

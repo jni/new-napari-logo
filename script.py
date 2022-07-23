@@ -130,30 +130,52 @@ for k, shp in enumerate(candidate_shapes[3:4], start=3):
             scale=np.full(2, squircle_scale),
             translate=np.full(2, squircle_translate),
             )
-    logo_layer = viewer.add_shapes(
-            [shp, shp, shp],
+    sandbank_layer = viewer.add_shapes(
+            [shp],
             shape_type='polygon',
-            edge_width=[0.2, 0, 0.1],
-            edge_color=[SAND, FOREST, FOREST],
-            face_color=[LAGOON, LAGOON, 'transparent'],
-            name=f'option-{i}-{j}',
+            edge_width=0.2,
+            edge_color=SAND,
+            face_color='transparent',
+            name=f'sand-{i}-{j}',
             opacity=1,
-            z_index=[0, 1, 3],
             **extra_params,
             )
-    logo_layer.add_ellipses(
+    lagoon_layer = viewer.add_shapes(
+            [shp],
+            shape_type='polygon',
+            edge_width=0,
+            face_color=LAGOON,
+            name=f'lagoon-{i}-{j}',
+            opacity=1,
+            **extra_params,
+            )
+    forest_layer = viewer.add_shapes(
+            [shp],
+            shape_type='polygon',
+            edge_width=0.1,
+            edge_color=FOREST,
+            face_color='transparent',
+            name=f'forest-{i}-{j}',
+            opacity=1,
+            **extra_params,
+            )
+
+    basis_circles = viewer.add_shapes(
             [
                     np.stack([c0, full(r0)]),
                     np.stack([c1, full(r1)]),
                     np.stack([c3i, full(r3i)]),
                     np.stack([c3j, full(r3j)]),
                     ],
-            edge_width=0.025,
-            edge_color=np.array(SAND) * [1, 1, 1, 0.4],
+            shape_type='ellipse',
+            edge_width=0.02,
+            edge_color=SAND,
             face_color='transparent',
-            z_index=5,
+            name=f'basis-circles-{i}-{j}',
+            opacity=0.7,
+            **extra_params,
             )
-    viewer.add_points(
+    centers = viewer.add_points(
             [c0, c1, c3i, c3j],
             size=0.1,
             face_color='white',
@@ -161,7 +183,7 @@ for k, shp in enumerate(candidate_shapes[3:4], start=3):
             visible=False,
             **extra_params,
             )
-    viewer.add_points(
+    contacts = viewer.add_points(
             [
                     [x1i, f0(x1i)],  # 0
                     [x1i, f3(x1i, c3i, r3i)],  # 1
@@ -190,7 +212,7 @@ for k, shp in enumerate(candidate_shapes[3:4], start=3):
             )
 
 viewer.grid.enabled = True
-viewer.grid.stride = -5
+viewer.grid.stride = -8
 
 if __name__ == '__main__':
     napari.run()

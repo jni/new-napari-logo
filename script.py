@@ -33,7 +33,7 @@ x1s = c0[0] + r0 / (r0+r3s) * (c3s[:, 0] - c0[0])
 x2s = c1[0] + r1 / (r1+r3s) * (c3s[:, 0] - c1[0])
 
 domain = np.array([1 - phi, phi + 1])
-xs = np.linspace(*domain, num=501, endpoint=True)
+xs = np.linspace(*domain, num=1001, endpoint=True)
 
 lines_top = []
 lines_bottom = []

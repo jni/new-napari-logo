@@ -201,7 +201,7 @@ for k, shp in enumerate(candidate_shapes[3:4], start=3):
             **extra_params,
             )
     mask_layer = viewer.add_shapes(
-            bottom_left_squircle_mask(),
+            [msk := bottom_left_squircle_mask(), msk[:, (1, 0)]],
             shape_type='polygon',
             edge_width=0,
             face_color='black',

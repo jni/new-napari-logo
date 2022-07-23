@@ -193,7 +193,7 @@ if __name__ == '__main__':
                         [x2j, -f1(x2j)],  # 4
                         [x2j, -f3(x2j, c3j * [1, -1], r3j)],  # 5
                         [x1j, -f3(x1j, c3j * [1, -1], r3j)],  # 6
-                        [x1j, -f0(x1j)],
+                        [x1j, -f0(x1j)],  # 7
                         ],
                 size=0.1,
                 face_color='red',

@@ -161,19 +161,38 @@ if __name__ == '__main__':
                 **extra_params,
                 )
 
-        basis_circles = viewer.add_shapes(
-                [
-                        np.stack([c0, full(r0)]),
-                        np.stack([c1, full(r1)]),
-                        np.stack([c3i, full(r3i)]),
-                        np.stack([c3j, full(r3j)]),
-                        ],
+        basis_circle_top = viewer.add_shapes(
+                [np.stack([c3i, full(r3i)])],
                 shape_type='ellipse',
                 edge_width=0.02,
                 edge_color=SAND,
                 face_color='transparent',
-                name=f'basis-circles-{i}-{j}',
+                name=f'basis-circle-top-{i}-{j}',
                 opacity=0.7,
+                visible=False,
+                **extra_params,
+                )
+        basis_circles_inner = viewer.add_shapes(
+                [np.stack([c0, full(r0)]),
+                 np.stack([c1, full(r1)])],
+                shape_type='ellipse',
+                edge_width=0.02,
+                edge_color=SAND,
+                face_color='transparent',
+                name=f'basis-circles-inner-{i}-{j}',
+                opacity=0.7,
+                visible=False,
+                **extra_params,
+                )
+        basis_circle_bottom = viewer.add_shapes(
+                [np.stack([c3j, full(r3j)])],
+                shape_type='ellipse',
+                edge_width=0.02,
+                edge_color=SAND,
+                face_color='transparent',
+                name=f'basis-circle-bottom-{i}-{j}',
+                opacity=0.7,
+                visible=False,
                 **extra_params,
                 )
         centers = viewer.add_points(
@@ -214,5 +233,5 @@ if __name__ == '__main__':
                 )
 
     viewer.grid.enabled = True
-    viewer.grid.stride = -8
+    viewer.grid.stride = -10
     napari.run()

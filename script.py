@@ -24,8 +24,6 @@ down. y points right.
 The background is a squircle, |x|⁵ + |y|⁵ = 1, centered on (0, 0) then scaled
 and translated.
 """
-
-import itertools
 import numpy as np
 import napari
 
@@ -60,24 +58,27 @@ squircle_scale = target_sidelen / 2
 squircle_translate = target_sidelen / 2
 
 # radius and center of the smaller bit of the island
-r0 = phi - 1
+r0 = phi - 1  # = 1/phi
 c0 = np.zeros(2)
 
 # radius and center of the larger bit of the island
 r1 = 1.
 c1 = np.array([phi, 0])
-r3s = np.array([(phi - 1)**2, phi - 1, 1, phi])
-c3s = np.array([
-        [xx := 7 - 4*phi, np.sqrt(1 - xx**2)],
-        [4*phi - 6, 2 * np.sqrt(10*phi - 3 * phi**2 - 8)],
-        [2 - phi, 2 * np.sqrt(phi - 1)],
-        [2*phi - 3, 2 * np.sqrt(2*phi - 2)],
-        ])
+
+# radius and center of the top of the neck
+r2 = 2 - phi  # = (phi - 1)**2
+c2 = np.array([xx := 7 - 4*phi, np.sqrt(1 - xx**2)])
+
+# radius and center of the bottom of the neck
+r3 = phi
+c3 = np.array([2*phi - 3, 2 * np.sqrt(2*phi - 2)])
 
 # Intersection point of the small circle and the outside circles
-x1s = c0[0] + r0 / (r0+r3s) * (c3s[:, 0] - c0[0])
+x1t = c0[0] + r0 / (r0+r2) * (c2[0] - c0[0])
+x1b = c0[0] + r0 / (r0+r3) * (c3[0] - c0[0])
 # intersection point of the outside circles and the large circle
-x2s = c1[0] + r1 / (r1+r3s) * (c3s[:, 0] - c1[0])
+x2t = c1[0] + r1 / (r1+r2) * (c2[0] - c1[0])
+x2b = c1[0] + r1 / (r1+r3) * (c3[0] - c1[0])
 
 # distance from the top of the small circle to the bottom of the large circle
 domain = np.array([1 - phi, phi + 1])
@@ -85,6 +86,55 @@ xs = np.linspace(*domain, num=1001, endpoint=True)
 
 lines_top = []
 lines_bottom = []
+
+
+def f0(x):
+    """Return the half-circle of the smaller lobe of the island."""
+    return np.sqrt(np.clip(r0**2 - x**2, 0, None))
+
+
+def f1(x):
+    """Return the half-circle of the larger lobe of the island."""
+    return np.sqrt(np.clip(r1**2 - (x - c1[0])**2, 0, None))
+
+
+def f2(x):
+    """Return the half-circle of the smaller neck of the island."""
+    return c2[1] - np.sqrt(np.clip(r2**2 - (x - c2[0])**2, 0, None))
+
+
+def f3(x):
+    """Return the half-circle of the smaller neck of the island."""
+    return c3[1] - np.sqrt(np.clip(r3**2 - (x - c3[0])**2, 0, None))
+
+
+# The three segments of the top curve
+xs0t = xs[xs < x1t]
+xs1t = xs[(x1t <= xs) & (xs < x2t)]
+xs2t = xs[x2t <= xs]
+
+# The three segments of the bottom curve (but inverted)
+xs0b = xs[xs < x1b]
+xs1b = xs[(x1b <= xs) & (xs < x2b)]
+xs2b = xs[x2b <= xs]
+
+# The y values (axis=1) for the top curve. Note the numbers are segment
+# numbers, not section numbers, hence the confusing inversion between 1 and 2
+# with the function names. Sorry.
+ys0t = f0(xs0t)
+ys1t = f2(xs1t)
+ys2t = f1(xs2t)
+ys_top = np.concatenate([ys0t, ys1t, ys2t])
+line_top = np.stack([xs, ys_top], axis=1)
+
+# As above for the bottom part of the curve.
+ys0b = -f0(xs0b)
+ys1b = -f3(xs1b)
+ys2b = -f1(xs2b)
+ys_bottom = np.concatenate([ys0b, ys1b, ys2b])
+line_bottom = np.stack([xs[-2:0:-1], ys_bottom[-2:0:-1]], axis=1)
+
+island_shape = np.concatenate([line_top, line_bottom])
 
 
 def unit_squircle(n_points=4000):
@@ -112,175 +162,126 @@ def bottom_left_squircle_mask(n_squircle_points=4000):
     return mask_outline[1:]  # remove discontinuous point at [-1, 0]
 
 
-def f0(x):
-    """Return the half-circle of the smaller lobe of the island."""
-    return np.sqrt(np.clip(r0**2 - x**2, 0, None))
-
-
-def f1(x):
-    """Return the half-circle of the larger lobe of the island."""
-    return np.sqrt(np.clip(r1**2 - (x - c1[0])**2, 0, None))
-
-
-def f3(x, c, r):
-    return c[1] - np.sqrt(np.clip(r**2 - (x - c[0])**2, 0, None))
-
-
-for r3, c3, x1, x2 in zip(r3s, c3s, x1s, x2s):
-    xs0 = xs[xs < x1]
-    xs1 = xs[(x1 <= xs) & (xs < x2)]
-    xs2 = xs[x2 <= xs]
-
-    ys0 = f0(xs0)
-    ys1 = f3(xs1, c3, r3)
-    ys2 = f1(xs2)
-
-    ys_top = np.concatenate([ys0, ys1, ys2])
-    line_top = np.stack([xs, ys_top], axis=1)
-    lines_top.append(line_top)
-
-    line_bottom = np.copy(line_top[-2:0:-1])
-    line_bottom[:, 1] *= -1
-
-    lines_bottom.append(line_bottom)
-
-candidate_shapes = [  # yapf: ignore
-        np.concatenate((line_top, line_bottom), axis=0)
-        for line_top, line_bottom in itertools.product(lines_top, lines_bottom)
-        ]
-
-
 def full(r):
     return np.array([r, r])
 
 
 if __name__ == '__main__':
     viewer = napari.Viewer()
-    for k, shp in enumerate(candidate_shapes[3:4], start=3):
-        i, j = np.divmod(k, len(c3s))
-        c3i = c3s[i]
-        r3i = r3s[i]
-        x1i = x1s[i]
-        x2i = x2s[i]
-        c3j = c3s[j] * [1, -1]
-        r3j = r3s[j]
-        x1j = x1s[j]
-        x2j = x2s[j]
-        extra_params = dict(
-                scale=[scale, scale],
-                translate=[translate, translate],
-                rotate=45,
-                )
-        background_layer = viewer.add_shapes(
-                [unit_squircle()],
-                shape_type='polygon',
-                edge_width=0,
-                face_color=OCEAN,
-                name=f'background-{i}-{j}',
-                opacity=1,
-                scale=np.full(2, squircle_scale),
-                translate=np.full(2, squircle_translate),
-                )
-        sandbank_layer = viewer.add_shapes(
-                [shp],
-                shape_type='polygon',
-                edge_width=phi / 5,
-                edge_color=SAND,
-                face_color='transparent',
-                name=f'sand-{i}-{j}',
-                opacity=1,
-                **extra_params,
-                )
-        lagoon_layer = viewer.add_shapes(
-                [shp],
-                shape_type='polygon',
-                edge_width=0,
-                face_color=LAGOON,
-                name=f'lagoon-{i}-{j}',
-                opacity=1,
-                **extra_params,
-                )
-        forest_layer = viewer.add_shapes(
-                [shp],
-                shape_type='polygon',
-                edge_width=phi / 10,
-                edge_color=FOREST,
-                face_color='transparent',
-                name=f'forest-{i}-{j}',
-                opacity=1,
-                **extra_params,
-                )
+    shp = island_shape
+    extra_params = dict(
+            scale=[scale, scale],
+            translate=[translate, translate],
+            rotate=45,
+            )
+    background_layer = viewer.add_shapes(
+            [unit_squircle()],
+            shape_type='polygon',
+            edge_width=0,
+            face_color=OCEAN,
+            name='background',
+            opacity=1,
+            scale=np.full(2, squircle_scale),
+            translate=np.full(2, squircle_translate),
+            )
+    sandbank_layer = viewer.add_shapes(
+            [shp],
+            shape_type='polygon',
+            edge_width=phi / 5,
+            edge_color=SAND,
+            face_color='transparent',
+            name='sand',
+            opacity=1,
+            **extra_params,
+            )
+    lagoon_layer = viewer.add_shapes(
+            [shp],
+            shape_type='polygon',
+            edge_width=0,
+            face_color=LAGOON,
+            name='lagoon',
+            opacity=1,
+            **extra_params,
+            )
+    forest_layer = viewer.add_shapes(
+            [shp],
+            shape_type='polygon',
+            edge_width=phi / 10,
+            edge_color=FOREST,
+            face_color='transparent',
+            name='forest',
+            opacity=1,
+            **extra_params,
+            )
 
-        basis_circle_top = viewer.add_shapes(
-                [np.stack([c3i, full(r3i)])],
-                shape_type='ellipse',
-                edge_width=0.02,
-                edge_color=SAND,
-                face_color='transparent',
-                name=f'basis-circle-top-{i}-{j}',
-                opacity=0.7,
-                visible=False,
-                **extra_params,
-                )
-        basis_circles_inner = viewer.add_shapes(
-                [np.stack([c0, full(r0)]),
-                 np.stack([c1, full(r1)])],
-                shape_type='ellipse',
-                edge_width=0.02,
-                edge_color=SAND,
-                face_color='transparent',
-                name=f'basis-circles-inner-{i}-{j}',
-                opacity=0.7,
-                visible=False,
-                **extra_params,
-                )
-        basis_circle_bottom = viewer.add_shapes(
-                [np.stack([c3j, full(r3j)])],
-                shape_type='ellipse',
-                edge_width=0.02,
-                edge_color=SAND,
-                face_color='transparent',
-                name=f'basis-circle-bottom-{i}-{j}',
-                opacity=0.7,
-                visible=False,
-                **extra_params,
-                )
-        centers = viewer.add_points(
-                [c0, c1, c3i, c3j],
-                size=0.1,
-                face_color='white',
-                name=f'centers-{i}-{j}',
-                visible=False,
-                **extra_params,
-                )
-        contacts = viewer.add_points(
-                [
-                        [x1i, f0(x1i)],  # 0
-                        [x1i, f3(x1i, c3i, r3i)],  # 1
-                        [x2i, f3(x2i, c3i, r3i)],  # 2
-                        [x2i, f1(x2i)],  # 3
-                        [x2j, -f1(x2j)],  # 4
-                        [x2j, -f3(x2j, c3j * [1, -1], r3j)],  # 5
-                        [x1j, -f3(x1j, c3j * [1, -1], r3j)],  # 6
-                        [x1j, -f0(x1j)],  # 7
-                        ],
-                size=0.1,
-                face_color='red',
-                name=f'contacts-{i}-{j}',
-                visible=False,
-                **extra_params,
-                )
-        mask_layer = viewer.add_shapes(
-                [msk := bottom_left_squircle_mask(), msk[:, (1, 0)]],
-                shape_type='polygon',
-                edge_width=0,
-                face_color='black',
-                name=f'mask-{i}-{j}',
-                opacity=1,
-                scale=np.full(2, squircle_scale),
-                translate=np.full(2, squircle_translate),
-                )
+    basis_circle_top = viewer.add_shapes(
+            [np.stack([c2, full(r2)])],
+            shape_type='ellipse',
+            edge_width=0.02,
+            edge_color=SAND,
+            face_color='transparent',
+            name='basis-circle-top',
+            opacity=0.7,
+            visible=False,
+            **extra_params,
+            )
+    basis_circles_inner = viewer.add_shapes(
+            [np.stack([c0, full(r0)]),
+             np.stack([c1, full(r1)])],
+            shape_type='ellipse',
+            edge_width=0.02,
+            edge_color=SAND,
+            face_color='transparent',
+            name='basis-circles-inner',
+            opacity=0.7,
+            visible=False,
+            **extra_params,
+            )
+    basis_circle_bottom = viewer.add_shapes(
+            [np.stack([c3 * [1, -1], full(r3)])],
+            shape_type='ellipse',
+            edge_width=0.02,
+            edge_color=SAND,
+            face_color='transparent',
+            name='basis-circle-bottom',
+            opacity=0.7,
+            visible=False,
+            **extra_params,
+            )
+    centers = viewer.add_points(
+            [c0, c1, c2, c3 * [1, -1]],
+            size=0.1,
+            face_color='white',
+            name='centers',
+            visible=False,
+            **extra_params,
+            )
+    contacts = viewer.add_points(
+            [
+                    [x1t, f0(x1t)],  # 0
+                    [x1t, f2(x1t)],  # 1
+                    [x2t, f2(x2t)],  # 2
+                    [x2t, f1(x2t)],  # 3
+                    [x2b, -f1(x2b)],  # 4
+                    [x2b, -f3(x2b)],  # 5
+                    [x1b, -f3(x1b)],  # 6
+                    [x1b, -f0(x1b)],  # 7
+                    ],
+            size=0.1,
+            face_color='red',
+            name='contacts',
+            visible=False,
+            **extra_params,
+            )
+    mask_layer = viewer.add_shapes(
+            [msk := bottom_left_squircle_mask(), msk[:, (1, 0)]],
+            shape_type='polygon',
+            edge_width=0,
+            face_color='black',
+            name='mask',
+            opacity=1,
+            scale=np.full(2, squircle_scale),
+            translate=np.full(2, squircle_translate),
+            )
 
-    viewer.grid.enabled = True
-    viewer.grid.stride = -10
     napari.run()

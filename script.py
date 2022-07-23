@@ -106,7 +106,7 @@ def full(r):
 
 if __name__ == '__main__':
     viewer = napari.Viewer()
-    for k, shp in enumerate(candidate_shapes[15:16], start=15):
+    for k, shp in enumerate(candidate_shapes[3:4], start=3):
         i, j = np.divmod(k, len(c3s))
         c3i = c3s[i]
         r3i = r3s[i]
@@ -134,7 +134,7 @@ if __name__ == '__main__':
         sandbank_layer = viewer.add_shapes(
                 [shp],
                 shape_type='polygon',
-                edge_width=0.2,
+                edge_width=phi / 5,
                 edge_color=SAND,
                 face_color='transparent',
                 name=f'sand-{i}-{j}',
@@ -153,7 +153,7 @@ if __name__ == '__main__':
         forest_layer = viewer.add_shapes(
                 [shp],
                 shape_type='polygon',
-                edge_width=0.1,
+                edge_width=phi / 10,
                 edge_color=FOREST,
                 face_color='transparent',
                 name=f'forest-{i}-{j}',

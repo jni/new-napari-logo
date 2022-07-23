@@ -104,115 +104,115 @@ def full(r):
     return np.array([r, r])
 
 
-viewer = napari.Viewer()
-for k, shp in enumerate(candidate_shapes[3:4], start=3):
-    i, j = np.divmod(k, len(c3s))
-    c3i = c3s[i]
-    r3i = r3s[i]
-    x1i = x1s[i]
-    x2i = x2s[i]
-    c3j = c3s[j] * [1, -1]
-    r3j = r3s[j]
-    x1j = x1s[j]
-    x2j = x2s[j]
-    extra_params = dict(
-            scale=[scale, scale],
-            translate=[translate, translate],
-            rotate=45,
-            )
-    background_layer = viewer.add_shapes(
-            [unit_squircle()],
-            shape_type='polygon',
-            edge_width=0,
-            face_color=OCEAN,
-            name=f'background-{i}-{j}',
-            opacity=1,
-            scale=np.full(2, squircle_scale),
-            translate=np.full(2, squircle_translate),
-            )
-    sandbank_layer = viewer.add_shapes(
-            [shp],
-            shape_type='polygon',
-            edge_width=0.2,
-            edge_color=SAND,
-            face_color='transparent',
-            name=f'sand-{i}-{j}',
-            opacity=1,
-            **extra_params,
-            )
-    lagoon_layer = viewer.add_shapes(
-            [shp],
-            shape_type='polygon',
-            edge_width=0,
-            face_color=LAGOON,
-            name=f'lagoon-{i}-{j}',
-            opacity=1,
-            **extra_params,
-            )
-    forest_layer = viewer.add_shapes(
-            [shp],
-            shape_type='polygon',
-            edge_width=0.1,
-            edge_color=FOREST,
-            face_color='transparent',
-            name=f'forest-{i}-{j}',
-            opacity=1,
-            **extra_params,
-            )
-
-    basis_circles = viewer.add_shapes(
-            [
-                    np.stack([c0, full(r0)]),
-                    np.stack([c1, full(r1)]),
-                    np.stack([c3i, full(r3i)]),
-                    np.stack([c3j, full(r3j)]),
-                    ],
-            shape_type='ellipse',
-            edge_width=0.02,
-            edge_color=SAND,
-            face_color='transparent',
-            name=f'basis-circles-{i}-{j}',
-            opacity=0.7,
-            **extra_params,
-            )
-    centers = viewer.add_points(
-            [c0, c1, c3i, c3j],
-            size=0.1,
-            face_color='white',
-            name=f'centers-{i}-{j}',
-            visible=False,
-            **extra_params,
-            )
-    contacts = viewer.add_points(
-            [
-                    [x1i, f0(x1i)],  # 0
-                    [x1i, f3(x1i, c3i, r3i)],  # 1
-                    [x2i, f3(x2i, c3i, r3i)],  # 2
-                    [x2i, f1(x2i)],  # 3
-                    [x2j, -f1(x2j)],  # 4
-                    [x2j, -f3(x2j, c3j * [1, -1], r3j)],  # 5
-                    [x1j, -f3(x1j, c3j * [1, -1], r3j)],  # 6
-                    [x1j, -f0(x1j)],
-                    ],
-            size=0.1,
-            face_color='red',
-            name=f'contacts-{i}-{j}',
-            visible=False,
-            **extra_params,
-            )
-    mask_layer = viewer.add_shapes(
-            [msk := bottom_left_squircle_mask(), msk[:, (1, 0)]],
-            shape_type='polygon',
-            edge_width=0,
-            face_color='black',
-            name=f'mask-{i}-{j}',
-            opacity=1,
-            scale=np.full(2, squircle_scale),
-            translate=np.full(2, squircle_translate),
-            )
-
-viewer.grid.enabled = True
-viewer.grid.stride = -8
-
 if __name__ == '__main__':
+    viewer = napari.Viewer()
+    for k, shp in enumerate(candidate_shapes[15:16], start=15):
+        i, j = np.divmod(k, len(c3s))
+        c3i = c3s[i]
+        r3i = r3s[i]
+        x1i = x1s[i]
+        x2i = x2s[i]
+        c3j = c3s[j] * [1, -1]
+        r3j = r3s[j]
+        x1j = x1s[j]
+        x2j = x2s[j]
+        extra_params = dict(
+                scale=[scale, scale],
+                translate=[translate, translate],
+                rotate=45,
+                )
+        background_layer = viewer.add_shapes(
+                [unit_squircle()],
+                shape_type='polygon',
+                edge_width=0,
+                face_color=OCEAN,
+                name=f'background-{i}-{j}',
+                opacity=1,
+                scale=np.full(2, squircle_scale),
+                translate=np.full(2, squircle_translate),
+                )
+        sandbank_layer = viewer.add_shapes(
+                [shp],
+                shape_type='polygon',
+                edge_width=0.2,
+                edge_color=SAND,
+                face_color='transparent',
+                name=f'sand-{i}-{j}',
+                opacity=1,
+                **extra_params,
+                )
+        lagoon_layer = viewer.add_shapes(
+                [shp],
+                shape_type='polygon',
+                edge_width=0,
+                face_color=LAGOON,
+                name=f'lagoon-{i}-{j}',
+                opacity=1,
+                **extra_params,
+                )
+        forest_layer = viewer.add_shapes(
+                [shp],
+                shape_type='polygon',
+                edge_width=0.1,
+                edge_color=FOREST,
+                face_color='transparent',
+                name=f'forest-{i}-{j}',
+                opacity=1,
+                **extra_params,
+                )
+
+        basis_circles = viewer.add_shapes(
+                [
+                        np.stack([c0, full(r0)]),
+                        np.stack([c1, full(r1)]),
+                        np.stack([c3i, full(r3i)]),
+                        np.stack([c3j, full(r3j)]),
+                        ],
+                shape_type='ellipse',
+                edge_width=0.02,
+                edge_color=SAND,
+                face_color='transparent',
+                name=f'basis-circles-{i}-{j}',
+                opacity=0.7,
+                **extra_params,
+                )
+        centers = viewer.add_points(
+                [c0, c1, c3i, c3j],
+                size=0.1,
+                face_color='white',
+                name=f'centers-{i}-{j}',
+                visible=False,
+                **extra_params,
+                )
+        contacts = viewer.add_points(
+                [
+                        [x1i, f0(x1i)],  # 0
+                        [x1i, f3(x1i, c3i, r3i)],  # 1
+                        [x2i, f3(x2i, c3i, r3i)],  # 2
+                        [x2i, f1(x2i)],  # 3
+                        [x2j, -f1(x2j)],  # 4
+                        [x2j, -f3(x2j, c3j * [1, -1], r3j)],  # 5
+                        [x1j, -f3(x1j, c3j * [1, -1], r3j)],  # 6
+                        [x1j, -f0(x1j)],
+                        ],
+                size=0.1,
+                face_color='red',
+                name=f'contacts-{i}-{j}',
+                visible=False,
+                **extra_params,
+                )
+        mask_layer = viewer.add_shapes(
+                [msk := bottom_left_squircle_mask(), msk[:, (1, 0)]],
+                shape_type='polygon',
+                edge_width=0.1,
+                edge_color='white',
+                face_color='red',
+                name=f'mask-{i}-{j}',
+                opacity=1,
+                scale=np.full(2, squircle_scale),
+                translate=np.full(2, squircle_translate),
+                )
+
+    viewer.grid.enabled = True
+    viewer.grid.stride = -8
     napari.run()

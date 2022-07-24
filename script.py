@@ -26,6 +26,7 @@ and translated.
 """
 import numpy as np
 import napari
+import imageio as iio
 
 # Color constants
 # ---------------
@@ -280,8 +281,14 @@ if __name__ == '__main__':
             face_color='black',
             name='mask',
             opacity=1,
+            visible=False,
             scale=np.full(2, squircle_scale),
             translate=np.full(2, squircle_translate),
             )
+
+    screenshot = viewer.screenshot()
+    mask = np.all([screenshot[:, :, i] == 0 for i in range(3)], axis=0)
+    screenshot[mask, 3] = 0
+    iio.imsave('logo.png', screenshot)
 
     napari.run()

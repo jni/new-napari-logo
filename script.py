@@ -174,8 +174,16 @@ def screenshot_with_alpha(viewer):
     return screenshot
 
 
-if __name__ == '__main__':
-    viewer = napari.Viewer()
+def make_logo(
+        viewer=None,
+        lagoon_color=LAGOON,
+        forest_color=FOREST,
+        sand_color=SAND,
+        ocean_color=OCEAN,
+        ) -> napari.Viewer:
+    if viewer is None:
+        viewer = napari.Viewer()
+    viewer.layers.clear()
     shp = island_shape
     extra_params = dict(
             scale=[scale, scale],
@@ -186,7 +194,7 @@ if __name__ == '__main__':
             [unit_squircle()],
             shape_type='polygon',
             edge_width=0,
-            face_color=OCEAN,
+            face_color=ocean_color,
             name='background',
             opacity=1,
             scale=np.full(2, squircle_scale),
@@ -196,7 +204,7 @@ if __name__ == '__main__':
             [shp],
             shape_type='polygon',
             edge_width=phi / 5,
-            edge_color=SAND,
+            edge_color=sand_color,
             face_color='transparent',
             name='sand',
             opacity=1,
@@ -206,7 +214,7 @@ if __name__ == '__main__':
             [shp],
             shape_type='polygon',
             edge_width=0,
-            face_color=LAGOON,
+            face_color=lagoon_color,
             name='lagoon',
             opacity=1,
             **extra_params,
@@ -215,7 +223,7 @@ if __name__ == '__main__':
             [shp],
             shape_type='polygon',
             edge_width=phi / 10,
-            edge_color=FOREST,
+            edge_color=forest_color,
             face_color='transparent',
             name='forest',
             opacity=1,
@@ -226,7 +234,7 @@ if __name__ == '__main__':
             [np.stack([c2, full(r2)])],
             shape_type='ellipse',
             edge_width=0.02,
-            edge_color=SAND,
+            edge_color='white',
             face_color='transparent',
             name='basis-circle-top',
             opacity=0.7,
@@ -238,7 +246,7 @@ if __name__ == '__main__':
              np.stack([c1, full(r1)])],
             shape_type='ellipse',
             edge_width=0.02,
-            edge_color=SAND,
+            edge_color='white',
             face_color='transparent',
             name='basis-circles-inner',
             opacity=0.7,
@@ -249,7 +257,7 @@ if __name__ == '__main__':
             [np.stack([c3 * [1, -1], full(r3)])],
             shape_type='ellipse',
             edge_width=0.02,
-            edge_color=SAND,
+            edge_color='white',
             face_color='transparent',
             name='basis-circle-bottom',
             opacity=0.7,
@@ -293,7 +301,4 @@ if __name__ == '__main__':
             translate=np.full(2, squircle_translate),
             )
 
-    screenshot = screenshot_with_alpha(viewer)
-    iio.imsave('logo.png', screenshot)
-
-    napari.run()
+    return viewer

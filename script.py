@@ -302,3 +302,11 @@ def make_logo(
             )
 
     return viewer
+
+
+if __name__ == '__main__':
+
+    viewer = make_logo()
+    screenshot = screenshot_with_alpha(viewer)
+    iio.imsave('logo.png', screenshot)
+    napari.run()

@@ -167,6 +167,13 @@ def full(r):
     return np.array([r, r])
 
 
+def screenshot_with_alpha(viewer):
+    screenshot = viewer.screenshot()
+    mask = np.all([screenshot[:, :, i] == 0 for i in range(3)], axis=0)
+    screenshot[mask, 3] = 0
+    return screenshot
+
+
 if __name__ == '__main__':
     viewer = napari.Viewer()
     shp = island_shape
@@ -286,9 +293,7 @@ if __name__ == '__main__':
             translate=np.full(2, squircle_translate),
             )
 
-    screenshot = viewer.screenshot()
-    mask = np.all([screenshot[:, :, i] == 0 for i in range(3)], axis=0)
-    screenshot[mask, 3] = 0
+    screenshot = screenshot_with_alpha(viewer)
     iio.imsave('logo.png', screenshot)
 
     napari.run()

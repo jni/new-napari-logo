@@ -320,4 +320,6 @@ if __name__ == '__main__':
     viewer = make_logo()
     screenshot = screenshot_with_alpha(viewer)
     iio.imsave('logo.png', screenshot)
+    screenshot2 = screenshot_with_alpha(viewer, hidpi=False)
+    iio.imsave('logo-hires.png', screenshot2)
     napari.run()

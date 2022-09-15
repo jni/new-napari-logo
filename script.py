@@ -46,17 +46,21 @@ phi = (1 + np.sqrt(5)) / 2
 # If you make the logo square, put the island at a 45° angle, and margins
 # around it of ϕ-1, this is the side length of the square.
 source_sidelen = (3 + 1 / np.sqrt(2)) * phi - 2
-# But when making a logo we want it to be 1024x1024 or similar. Set the pixel
-# size of the square here
-target_sidelen = 1024
+# But when making a logo we want it to be 1024x1024, *with 10% transparent
+# margins around it.* See:
+# https://developer.apple.com/design/human-interface-guidelines/foundations/app-icons#macos/
+square_len = 1024
+offset_frac = 0.08
+offset = square_len * offset_frac
+target_sidelen = square_len * (1 - 2*offset_frac)
 scale = target_sidelen / source_sidelen
 # the margins + the radius of the smaller circle.
-translate = 2 * (phi-1) * scale
+translate = 2 * (phi-1) * scale + offset
 
 # A squircle has range (-1, 1) in both x and y, hence an unscaled side length
 # of 1 - (-1) = 2.
 squircle_scale = target_sidelen / 2
-squircle_translate = target_sidelen / 2
+squircle_translate = target_sidelen/2 + offset
 
 # radius and center of the smaller bit of the island
 r0 = phi - 1  # = 1/phi
@@ -167,8 +171,15 @@ def full(r):
     return np.array([r, r])
 
 
-def screenshot_with_alpha(viewer):
+def screenshot_with_alpha(viewer, size=1024, hidpi=True):
+    canvas = viewer.window._qt_viewer.canvas
+    prev_size = canvas.size
+    factor = 2**int(hidpi)
+    canvas.size = (size // factor, size // factor)
+    viewer.camera.zoom = 1 / factor
     screenshot = viewer.screenshot()
+    canvas.size = prev_size
+    # Could add drop shadow here
     mask = np.all([screenshot[:, :, i] == 0 for i in range(3)], axis=0)
     screenshot[mask, 3] = 0
     return screenshot
